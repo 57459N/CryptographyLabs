@@ -3,8 +3,6 @@
 
 from abc import ABC, abstractmethod
 
-alphabet = 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'
-
 
 def extended_gcd(a: int, b: int):
     if a == 0:
@@ -81,24 +79,27 @@ class VigenereCipher(BaseCipher):
             k = self.key[i % len(self.key)]
             c_index = self.char_to_int[c]
             k_index = self.char_to_int[k]
-            new_c_index = (c_index + k_index) % len(alphabet)
+            new_c_index = (c_index + k_index) % len(self.int_to_char)
             new_c = self.int_to_char[new_c_index]
             new_text += new_c
         return new_text
 
     def decrypt(self, text: str) -> str:
+        m = len(self.int_to_char)
         new_text = ''
         for i, c in enumerate(text):
             k = self.key[i % len(self.key)]
             c_index = self.char_to_int[c]
             k_index = self.char_to_int[k]
-            new_c_index = (c_index - k_index + len(alphabet)) % len(alphabet)
+            new_c_index = (c_index - k_index + m) % m
             new_c = self.int_to_char[new_c_index]
             new_text += new_c
         return new_text
 
 
 if __name__ == "__main__":
+    # alphabet = 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'
+
     # Affine
     first_name = 'Индюков'
     first_name = first_name.upper()
