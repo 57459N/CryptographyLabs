@@ -100,11 +100,14 @@ class VigenereCipher(BaseCipher):
 if __name__ == "__main__":
     alphabet = 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'
 
-    # Affine
+    # Option 2
     first_name = 'Индюков'
+    a, b = 7, 17
+    vigenere_code = 'ДЮЖЗЦБАРШЁИАИХЖВ'
+    vigenere_key = 'ХИШ'
+
+    # Affine
     first_name = first_name.upper()
-    a = 7
-    b = 17
     a_crypter = AffineCipher(alphabet, (a, b))
 
     affine_encrypted = a_crypter.encrypt(first_name)
@@ -113,10 +116,9 @@ if __name__ == "__main__":
     print(f'Affine decryption: {affine_encrypted} ({a}, {b}) -> {affine_decrypted}')
 
     print()
+
     # Vigenere
-    vigenere_code = 'ДЮЖЗЦБАРШЁИАИХЖВ'
-    vigenere_key = 'ХИШ'
-    v_crypter = VigenereCipher(alphabet, 'ХИШ')
+    v_crypter = VigenereCipher(alphabet, vigenere_key)
 
     vigenere_decrypted = v_crypter.decrypt(vigenere_code)
     vigenere_encrypted = v_crypter.encrypt(vigenere_decrypted)
