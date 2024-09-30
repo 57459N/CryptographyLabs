@@ -98,7 +98,7 @@ class VigenereCipher(BaseCipher):
 
 
 if __name__ == "__main__":
-    # alphabet = 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'
+    alphabet = 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'
 
     # Affine
     first_name = 'Индюков'
