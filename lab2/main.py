@@ -1,16 +1,16 @@
 from typing import Callable
 
 N = 2  # position in group list
-surname = 'Индюков'
-name = 'Станислав'
+SURNAME = 'Индюков'
+NAME = 'Станислав'
 
-round_bits_list = [
+ROUND_BITS_LIST = [
     [1, 2, 3, 4, 5, 6, 7, 8],
     [1, 2, 3, 4, 9, 10, 11, 12],
     [5, 6, 7, 8, 12, 11, 10, 9],
 ]
-s1_idx = 1
-s2_idx = 7
+S1_IDX = 1
+S2_IDX = 7
 
 table_114 = {
     1: [10, 9, 13, 6, 14, 11, 4, 5, 15, 1, 3, 12, 7, 0, 8, 2],
@@ -64,9 +64,9 @@ def sp_crypt(X: int, key: int, iters: int = 3, verbose: bool = True) -> int:
         value = sp_round(
             value,
             key,
-            round_bits_list[i % len(round_bits_list)],
+            ROUND_BITS_LIST[i % len(ROUND_BITS_LIST)],
             plus=square_plus,
-            s1=table_114[s1_idx], s2=table_114[s2_idx],
+            s1=table_114[S1_IDX], s2=table_114[S2_IDX],
             p_=lambda x: ((x << 6) | (x >> (8 - 6))) & 0xff
         )
         if verbose:
@@ -80,8 +80,8 @@ def feistel_crypt(X: int, key: int, iters: int = 3, verbose: bool = True) -> int
 
 
 def main():
-    r = len(surname)
-    q = len(name)
+    r = len(SURNAME)
+    q = len(NAME)
 
     X = 9 * N
     key = abs(4096 - 13 * q * r)
