@@ -1,14 +1,8 @@
 import binascii
 from typing import Callable
 
-
-def xor(a: int, b: int, _len: int) -> int:
-    return (a ^ b) & ((1 << _len) - 1)
-
-
-def square_plus(a: int, b: int, _len: int) -> int:
-    return (a + b) & ((1 << _len) - 1)
-
+xor = lambda a, b, _len: (a ^ b) & ((1 << _len) - 1)
+square_plus = lambda a, b, _len: (a + b) & ((1 << _len) - 1)
 
 N = 2  # position in group list
 SURNAME = 'Индюков'
