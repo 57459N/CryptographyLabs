@@ -1,4 +1,14 @@
+import binascii
 from typing import Callable
+
+
+def xor(a: int, b: int, _len: int) -> int:
+    return (a ^ b) & ((1 << _len) - 1)
+
+
+def square_plus(a: int, b: int, _len: int) -> int:
+    return (a + b) & ((1 << _len) - 1)
+
 
 N = 2  # position in group list
 SURNAME = 'Индюков'
@@ -11,6 +21,8 @@ ROUND_BITS_LIST = [
 ]
 S1_IDX = 1
 S2_IDX = 7
+PLUS = square_plus
+P_FUNC = lambda x: ((x << 6) | (x >> (8 - 6))) & 0xff
 
 table_114 = {
     1: [10, 9, 13, 6, 14, 11, 4, 5, 15, 1, 3, 12, 7, 0, 8, 2],
@@ -22,14 +34,6 @@ table_114 = {
     7: [3, 8, 11, 5, 6, 4, 14, 10, 2, 12, 1, 7, 9, 15, 13, 0],
     8: [1, 2, 3, 14, 6, 13, 11, 8, 15, 10, 12, 5, 7, 9, 0, 4],
 }
-
-
-def xor(a: int, b: int, _len: int) -> int:
-    return (a ^ b) & ((1 << _len) - 1)
-
-
-def square_plus(a: int, b: int, _len: int) -> int:
-    return (a + b) & ((1 << _len) - 1)
 
 
 def sp_round(x: int, key: int,
@@ -67,16 +71,59 @@ def sp_crypt(X: int, key: int, iters: int = 3, verbose: bool = True) -> int:
             ROUND_BITS_LIST[i % len(ROUND_BITS_LIST)],
             plus=square_plus,
             s1=table_114[S1_IDX], s2=table_114[S2_IDX],
-            p_=lambda x: ((x << 6) | (x >> (8 - 6))) & 0xff
+            p_=P_FUNC
         )
         if verbose:
             print(f'after {i + 1}: {value :08b}')
     return value
 
 
-def feistel_crypt(X: int, key: int, iters: int = 3, verbose: bool = True) -> int:
-    # todo
-    pass
+def feistel_encrypt(X: bytes, key: int) -> bytes:
+    # align by 16 bits
+    if len(X) % 2:
+        X += b'\x00'
+
+    result = b''
+    for pair in range(0, len(X), 2):
+        left = int(X[pair])
+        right = int(X[pair + 1])
+
+        for i in range(6):
+            c = sp_round(right,
+                         key=key,
+                         round_bits=ROUND_BITS_LIST[i % len(ROUND_BITS_LIST)],
+                         plus=PLUS,
+                         s1=table_114[S1_IDX], s2=table_114[S2_IDX],
+                         p_=P_FUNC
+                         )
+            c ^= left
+            left = right
+            right = c
+        result += right.to_bytes(1, 'big')
+        result += left.to_bytes(1, 'big')
+    return result
+
+
+def feistel_decrypt(X: bytes, key: int) -> bytes:
+    result = b''
+    for pair in range(0, len(X), 2):
+        left = int(X[pair + 1])
+        right = int(X[pair])
+
+        for i in range(5, -1, -1):
+            c = sp_round(left,
+                         key=key,
+                         round_bits=ROUND_BITS_LIST[i % len(ROUND_BITS_LIST)],
+                         plus=PLUS,
+                         s1=table_114[S1_IDX], s2=table_114[S2_IDX],
+                         p_=lambda x: ((x << 6) | (x >> (8 - 6))) & 0xff
+                         )
+            c ^= right
+            right = left
+            left = c
+        result += left.to_bytes(1, 'big')
+        result += right.to_bytes(1, 'big')
+    return result
 
 
 def main():
@@ -86,8 +133,18 @@ def main():
     X = 9 * N
     key = abs(4096 - 13 * q * r)
 
+    print(f'----------------SP ROUNDS-------------------')
     print(f'start: {X :08b}')
-    print(f'crypt: {sp_crypt(X, key, verbose=False) :08b}')
+    print(f'crypt: {sp_crypt(X, key, verbose=False) :08b}', end='\n\n')
+
+    print(f'--------------FEISTEL CRYPT-----------------')
+    s = 'hello'
+    sb = s.encode('utf-8')
+    print(f'Text: {s} - {binascii.hexlify(sb)}')
+    encrypted = feistel_encrypt(sb, key)
+    print(f'Encrypted: {binascii.hexlify(encrypted)}')
+    decrypted = feistel_decrypt(encrypted, key).decode('utf-8', 'ignore')
+    print(f'Decrypted: {decrypted}')
 
 
 if __name__ == "__main__":
