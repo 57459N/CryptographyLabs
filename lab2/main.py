@@ -1,5 +1,17 @@
 from typing import Callable
 
+N = 2  # position in group list
+surname = 'Индюков'
+name = 'Станислав'
+
+round_bits_list = [
+    [1, 2, 3, 4, 5, 6, 7, 8],
+    [1, 2, 3, 4, 9, 10, 11, 12],
+    [5, 6, 7, 8, 12, 11, 10, 9],
+]
+s1_idx = 1
+s2_idx = 7
+
 table_114 = {
     1: [10, 9, 13, 6, 14, 11, 4, 5, 15, 1, 3, 12, 7, 0, 8, 2],
     2: [8, 0, 12, 4, 9, 6, 7, 11, 2, 3, 1, 15, 5, 14, 10, 13],
@@ -43,14 +55,6 @@ def sp_round(x: int, key: int,
 
 
 def sp_crypt(X: int, key: int, iters: int = 3, verbose: bool = True) -> int:
-    round_bits_list = [
-        [1, 2, 3, 4, 5, 6, 7, 8],
-        [1, 2, 3, 4, 9, 10, 11, 12],
-        [5, 6, 7, 8, 12, 11, 10, 9],
-    ]
-    s1_idx = 1
-    s2_idx = 7
-
     value = X
     if verbose:
         print(f'k: {key :012b}')
@@ -60,7 +64,7 @@ def sp_crypt(X: int, key: int, iters: int = 3, verbose: bool = True) -> int:
         value = sp_round(
             value,
             key,
-            round_bits_list[i],
+            round_bits_list[i % len(round_bits_list)],
             plus=square_plus,
             s1=table_114[s1_idx], s2=table_114[s2_idx],
             p_=lambda x: ((x << 6) | (x >> (8 - 6))) & 0xff
@@ -70,11 +74,12 @@ def sp_crypt(X: int, key: int, iters: int = 3, verbose: bool = True) -> int:
     return value
 
 
-def main():
-    N = 2  # position in group list
-    surname = 'Индюков'
-    name = 'Станислав'
+def feistel_crypt(X: int, key: int, iters: int = 3, verbose: bool = True) -> int:
+    # todo
+    pass
 
+
+def main():
     r = len(surname)
     q = len(name)
 
