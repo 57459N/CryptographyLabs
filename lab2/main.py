@@ -14,7 +14,7 @@ ROUND_BITS_LIST = [
     [5, 6, 7, 8, 12, 11, 10, 9],
 ]
 S1_IDX = 1
-S2_IDX = 7
+S2_IDX = 2
 PLUS = square_plus
 P_FUNC = lambda x: ((x << 6) | (x >> (8 - 6))) & 0xff
 
@@ -129,7 +129,7 @@ def main():
 
     print(f'----------------SP ROUNDS-------------------')
     print(f'start: {X :08b}')
-    print(f'crypt: {sp_crypt(X, key, verbose=False) :08b}', end='\n\n')
+    print(f'crypt: {sp_crypt(X, key, verbose=True) :08b}', end='\n\n')
 
     print(f'--------------FEISTEL CRYPT-----------------')
     s = 'hello'
