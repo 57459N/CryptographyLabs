@@ -1,5 +1,5 @@
 from elgamal import generate_keys, sign, verify
-from lab4.algorithms import gcd
+from algorithms import gcd
 
 
 def _help():
