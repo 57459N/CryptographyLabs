@@ -1,4 +1,5 @@
 from elgamal import generate_keys, sign, verify
+from lab4.algorithms import gcd
 
 
 def _help():
@@ -36,6 +37,11 @@ def main():
                 try:
                     p, q, g, d = int(args[1]), int(args[2]), int(args[3]), int(args[4])
                     message = ''.join(args[5:])
+
+                    if gcd(d, q) != 1:
+                        print(f"Such private key does not fit to {q=}.")
+                        continue
+
                     print(*sign(p, q, g, d, message))
                 except ValueError:
                     print("Arguments must be integers.")
@@ -47,6 +53,11 @@ def main():
                     p, q, g, e = int(args[1]), int(args[2]), int(args[3]), int(args[4])
                     r, s = int(args[5]), int(args[6])
                     message = ''.join(args[7:])
+
+                    if gcd(e, p) != 1:
+                        print(f"Such public key does not fit to {p=}.")
+                        continue
+
                     print(verify(p, q, g, e, message, (r, s)))
                 except ValueError:
                     print("Arguments must be integers.")
